@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Özel Beslenme Prototip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --green:#004125; --leaf:#2e9e63; --leaf2:#44b183; --mint:#C2DEBA; --mint-soft:#EAF4E7;
+  --ink:#0e1411; --ink2:#4A4E4C; --pink:#D34092; --bg:#F6FAF6; --card:#ffffff;
+  --r:18px; --shadow:0 6px 24px rgba(14,20,17,.08);
+  font-size:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);
+  background:linear-gradient(160deg,#eef6ee 0%,#dcefe2 55%,#cfe8d8 100%);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:24px 0;
+}
+.stage-note{font-size:12px;color:#3c5a48;letter-spacing:.4px;font-weight:600;text-align:center}
+.stage-note b{color:var(--green)}
+/* ==== PHONE FRAME ==== */
+.phone{
+  width:393px;height:830px;background:#0b0b0c;border-radius:54px;padding:10px;position:relative;
+  box-shadow:0 30px 80px rgba(0,40,20,.35),0 4px 14px rgba(0,0,0,.2);
+}
+.screen-wrap{width:100%;height:100%;border-radius:45px;overflow:hidden;background:var(--bg);position:relative}
+.notch{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:118px;height:34px;background:#0b0b0c;border-radius:20px;z-index:60}
+.statusbar{position:absolute;top:0;left:0;right:0;height:54px;display:flex;justify-content:space-between;align-items:center;padding:20px 30px 0;z-index:55;font-size:14px;font-weight:700;pointer-events:none}
+@media(max-width:500px){
+  body{padding:0}
+  .phone{width:100vw;height:100dvh;border-radius:0;padding:0;box-shadow:none}
+  .screen-wrap{border-radius:0}
+  .notch{display:none}
+  .stage-note{display:none}
+}
+/* ==== SCREENS ==== */
+.scr{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;background:var(--bg)}
+.scr.active{display:flex;animation:slidein .32s cubic-bezier(.2,.8,.25,1)}
+@keyframes slidein{from{transform:translateX(26px);opacity:0}to{transform:none;opacity:1}}
+.scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-bottom:110px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+/* ==== TABBAR ==== */
+.tabbar{position:absolute;bottom:0;left:0;right:0;height:86px;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-top:1px solid #e7efe7;display:flex;align-items:flex-start;padding-top:10px;z-index:50}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:600;color:#9aa89e;cursor:pointer;border:none;background:none;font-family:inherit}
+.tab .ic{font-size:21px;line-height:1}
+.tab.on{color:var(--green)}
+.tab-fab{flex:1;display:flex;justify-content:center}
+.fab{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--leaf));color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;margin-top:-30px;box-shadow:0 8px 20px rgba(0,65,37,.35);border:4px solid var(--bg);cursor:pointer}
+.badge-cart{position:absolute;margin-left:26px;margin-top:-4px;background:var(--pink);color:#fff;font-size:9.5px;font-weight:800;min-width:16px;height:16px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+/* ==== SHARED ==== */
+.hdr{padding:64px 20px 12px;display:flex;align-items:center;gap:12px}
+.hdr img.logo{height:30px}
+.hdr .spacer{flex:1}
+.iconbtn{width:38px;height:38px;border-radius:12px;background:#fff;border:1px solid #e7efe7;display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer}
+.back{background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink);padding:4px 8px 4px 0}
+.searchbar{margin:6px 20px 4px;background:#fff;border:1.5px solid #e2ece2;border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:center;color:#8ba092;font-size:14px;font-weight:500}
+.searchbar .ai-tag{margin-left:auto;background:var(--mint-soft);color:var(--green);font-size:10px;font-weight:800;padding:3px 8px;border-radius:8px;white-space:nowrap}
+h2.sec{font-size:17px;font-weight:800;padding:18px 20px 10px;display:flex;align-items:center;gap:8px}
+h2.sec .all{margin-left:auto;font-size:12px;color:var(--leaf);font-weight:700}
+/* stories */
+.stories{display:flex;gap:14px;padding:12px 20px 4px;overflow-x:auto;scrollbar-width:none}
+.stories::-webkit-scrollbar{display:none}
+.story{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:var(--ink2);flex-shrink:0;cursor:pointer}
+.story .ring{width:62px;height:62px;border-radius:50%;padding:3px;background:conic-gradient(var(--leaf2),var(--pink),#f7b32b,var(--leaf2))}
+.story .inner{width:100%;height:100%;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;border:2.5px solid var(--bg)}
+/* hero / greeting */
+.greet{margin:10px 20px 0;background:linear-gradient(120deg,var(--green) 0%,#0c6b41 100%);border-radius:20px;padding:18px;color:#fff;position:relative;overflow:hidden}
+.greet::after{content:"🌿";position:absolute;right:-6px;bottom:-14px;font-size:74px;opacity:.18;transform:rotate(-12deg)}
+.greet .hi{font-size:15px;font-weight:800}
+.greet .sub{font-size:12.5px;opacity:.85;margin-top:4px;line-height:1.45}
+.greet .chips{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.greet .chip-mini{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:20px}
+/* quick actions */
+.quick{display:flex;gap:10px;padding:14px 20px 0}
+.qa{flex:1;background:#fff;border:1px solid #e7efe7;border-radius:16px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--ink);cursor:pointer;box-shadow:0 2px 8px rgba(14,20,17,.04)}
+.qa .qic{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.qa:nth-child(1) .qic{background:#fdf0f7}
+.qa:nth-child(2) .qic{background:var(--mint-soft)}
+.qa:nth-child(3) .qic{background:#fff6e5}
+.qa .new{font-size:8.5px;background:var(--pink);color:#fff;padding:2px 6px;border-radius:8px;font-weight:800;letter-spacing:.4px}
+/* product cards */
+.shelf{display:flex;gap:12px;padding:4px 20px 8px;overflow-x:auto;scrollbar-width:none}
+.shelf::-webkit-scrollbar{display:none}
+.pcard{width:150px;flex-shrink:0;background:#fff;border:1px solid #ecf2ec;border-radius:var(--r);padding:10px;position:relative;cursor:pointer;box-shadow:0 2px 8px rgba(14,20,17,.04)}
+.pcard .pimg{width:100%;height:110px;object-fit:contain;border-radius:10px;background:#fff}
+.pcard .disc{position:absolute;top:8px;left:8px;background:var(--pink);color:#fff;font-size:10px;font-weight:800;padding:3px 7px;border-radius:8px}
+.pcard .bds{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:3px}
+.bd{font-size:8.5px;font-weight:800;padding:2.5px 6px;border-radius:7px;color:#fff;letter-spacing:.3px}
+.bd.GF{background:#e8930c}.bd.VG{background:var(--leaf)}.bd.LP{background:#7c5cd6}.bd.OR{background:#4c8c2b}
+.pcard .pb{font-size:9.5px;color:#93a398;font-weight:700;text-transform:uppercase;margin-top:7px;letter-spacing:.3px}
+.pcard .pt{font-size:12px;font-weight:700;line-height:1.35;height:33px;overflow:hidden;margin-top:2px}
+.pcard .pr{display:flex;align-items:baseline;gap:6px;margin-top:7px;padding-right:30px}
+.pcard .pr .now{font-size:13.5px;font-weight:800;color:var(--green);white-space:nowrap}
+.pcard .pr .old{font-size:10.5px;color:#a9b5ab;text-decoration:line-through;white-space:nowrap}
+.pcard .add{position:absolute;bottom:10px;right:10px;width:28px;height:28px;border-radius:10px;background:var(--green);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer}
+/* flash banner */
+.flash{margin:14px 20px 0;background:linear-gradient(120deg,#c8237e,var(--pink));border-radius:20px;padding:16px 18px;color:#fff;display:flex;align-items:center;gap:12px;cursor:pointer}
+.flash .fl{font-size:26px}
+.flash .ft b{font-size:15px;font-weight:800;display:block}
+.flash .ft span{font-size:11.5px;opacity:.9}
+.flash .timer{margin-left:auto;background:rgba(255,255,255,.18);padding:7px 10px;border-radius:12px;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
+/* ==== ONBOARDING ==== */
+.ob{padding:80px 26px 26px;display:flex;flex-direction:column;position:absolute;inset:0;overflow-y:auto}
+.ob img.logo{height:44px;align-self:flex-start}
+.ob h1{font-size:25px;font-weight:800;line-height:1.25;margin-top:26px}
+.ob h1 em{font-style:normal;color:var(--leaf)}
+.ob p.lead{font-size:13.5px;color:var(--ink2);margin-top:10px;line-height:1.55}
+.ob .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
+.diet{background:#fff;border:2px solid #e7efe7;border-radius:16px;padding:14px 12px;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:.15s;font-weight:700;font-size:13px}
+.diet .em{font-size:22px}
+.diet small{font-size:10.5px;color:#93a398;font-weight:600}
+.diet.sel{border-color:var(--leaf);background:var(--mint-soft)}
+.diet.sel::after{content:"✓";align-self:flex-end;margin-top:-24px;color:var(--leaf);font-weight:800}
+.ob h3{font-size:13px;font-weight:800;margin-top:20px;color:var(--ink2)}
+.alg{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.alg .a{border:1.5px solid #e2ece2;background:#fff;border-radius:20px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer}
+.alg .a.sel{background:#fdeef5;border-color:var(--pink);color:var(--pink)}
+.cta{margin-top:auto;padding-top:22px}
+.btn-p{width:100%;background:var(--green);color:#fff;border:none;border-radius:16px;padding:17px;font-size:15.5px;font-weight:800;font-family:inherit;cursor:pointer;box-shadow:0 10px 24px rgba(0,65,37,.28)}
+.btn-ghost{width:100%;background:none;border:none;color:#8ba092;font-size:13px;font-weight:700;padding:14px;font-family:inherit;cursor:pointer}
+/* ==== CATEGORY ==== */
+.filterline{margin:10px 20px 0;background:var(--mint-soft);border:1px dashed var(--leaf2);border-radius:12px;padding:10px 12px;font-size:12px;font-weight:700;color:var(--green);display:flex;gap:8px;align-items:center}
+.catgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 20px}
+.cat{background:#fff;border:1px solid #ecf2ec;border-radius:18px;padding:16px 14px;cursor:pointer;box-shadow:0 2px 8px rgba(14,20,17,.04)}
+.cat .cem{font-size:26px}
+.cat b{display:block;font-size:13.5px;margin-top:8px}
+.cat span{font-size:11px;color:#93a398;font-weight:600}
+/* ==== PRODUCT DETAIL ==== */
+.pd-img{background:#fff;padding:20px;display:flex;justify-content:center;position:relative}
+.pd-img img{height:230px;object-fit:contain}
+.pd-body{background:#fff;border-radius:26px 26px 0 0;margin-top:-16px;padding:20px;flex:1}
+.stars{color:#f7b32b;font-size:13px;font-weight:700}
+.stars small{color:#93a398;font-weight:600}
+.pd-body h1{font-size:18px;font-weight:800;line-height:1.35;margin-top:6px}
+.pd-brand{font-size:11px;font-weight:800;color:var(--leaf);text-transform:uppercase;letter-spacing:.5px;margin-top:10px}
+.inforow{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.info{background:var(--mint-soft);border-radius:12px;padding:8px 12px;font-size:11.5px;font-weight:700;color:var(--green);display:flex;gap:6px;align-items:center}
+.info.warn{background:#fff6e5;color:#a06a00}
+.qtytiers{display:flex;gap:8px;margin-top:16px}
+.tier{flex:1;border:2px solid #e7efe7;border-radius:14px;padding:10px 8px;text-align:center;cursor:pointer;background:#fff}
+.tier b{display:block;font-size:13.5px}
+.tier small{font-size:10px;color:#93a398;font-weight:700}
+.tier .save{display:block;font-size:9.5px;color:var(--pink);font-weight:800;margin-top:2px}
+.tier.sel{border-color:var(--green);background:var(--mint-soft)}
+.buybar{position:absolute;bottom:86px;left:0;right:0;background:#fff;border-top:1px solid #eef3ee;padding:14px 20px 16px;display:flex;gap:14px;align-items:center;z-index:40}
+.buybar .tot small{display:block;font-size:10.5px;color:#93a398;font-weight:700}
+.buybar .tot b{font-size:20px;color:var(--green)}
+.buybar .btn-p{flex:1;margin:0;padding:15px}
+/* ==== SCAN ==== */
+.scan{background:#0c1210;color:#fff;flex:1;display:flex;flex-direction:column;position:relative}
+.scan .hdr2{padding:66px 20px 10px;display:flex;align-items:center;gap:10px}
+.scan .hdr2 b{font-size:16px}
+.scan .hdr2 .back{color:#fff}
+.viewport{margin:16px 30px;flex:1;border-radius:24px;position:relative;background:
+  radial-gradient(120% 90% at 50% 10%,#22352c 0%,#101c16 60%,#0a120e 100%);overflow:hidden;max-height:390px}
+.corner{position:absolute;width:34px;height:34px;border:3.5px solid var(--leaf2)}
+.c1{top:26px;left:26px;border-right:none;border-bottom:none;border-radius:10px 0 0 0}
+.c2{top:26px;right:26px;border-left:none;border-bottom:none;border-radius:0 10px 0 0}
+.c3{bottom:26px;left:26px;border-right:none;border-top:none;border-radius:0 0 0 10px}
+.c4{bottom:26px;right:26px;border-left:none;border-top:none;border-radius:0 0 10px 0}
+.scanline{position:absolute;left:34px;right:34px;height:2.5px;background:linear-gradient(90deg,transparent,var(--leaf2),transparent);animation:sweep 1.6s ease-in-out infinite;box-shadow:0 0 14px var(--leaf2)}
+@keyframes sweep{0%,100%{top:16%}50%{top:80%}}
+.scan .hint{text-align:center;font-size:12.5px;color:#9db8a8;padding:6px 40px 20px;line-height:1.5}
+.scanresult{position:absolute;left:0;right:0;bottom:0;background:#fff;color:var(--ink);border-radius:26px 26px 0 0;padding:22px 20px 34px;transform:translateY(105%);transition:.45s cubic-bezier(.2,.8,.25,1);z-index:45}
+.scanresult.show{transform:none}
+.match{display:flex;gap:8px;align-items:center;background:var(--mint-soft);border-radius:12px;padding:10px 12px;font-size:12.5px;font-weight:800;color:var(--green)}
+.sr-prod{display:flex;gap:14px;margin-top:14px;align-items:center}
+.sr-prod img{width:74px;height:74px;object-fit:contain;background:#f7faf7;border-radius:14px;padding:6px}
+.sr-prod .t{font-size:13.5px;font-weight:800;line-height:1.35}
+.sr-prod .p{font-size:16px;font-weight:800;color:var(--green);margin-top:4px}
+.sr-prod .ship{font-size:10.5px;color:#93a398;font-weight:700}
+/* ==== AI CHAT ==== */
+.chat{flex:1;overflow-y:auto;padding:10px 18px 230px;display:flex;flex-direction:column;gap:12px;scrollbar-width:none}
+.msg{max-width:82%;padding:12px 14px;border-radius:18px;font-size:13.5px;line-height:1.5;animation:pop .3s ease}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+.msg.user{align-self:flex-end;background:var(--green);color:#fff;border-bottom-right-radius:6px}
+.msg.bot{align-self:flex-start;background:#fff;border:1px solid #ecf2ec;border-bottom-left-radius:6px}
+.msg.bot b{color:var(--green)}
+.aiprods{display:flex;gap:10px;overflow-x:auto;padding:2px 18px;margin-top:-4px;scrollbar-width:none}
+.aicard{width:118px;flex-shrink:0;background:#fff;border:1px solid #ecf2ec;border-radius:14px;padding:8px;font-size:10.5px;font-weight:700;cursor:pointer}
+.aicard img{width:100%;height:74px;object-fit:contain}
+.aicard .p{color:var(--green);font-weight:800;font-size:12px;margin-top:3px}
+.sugg{display:flex;gap:8px;overflow-x:auto;padding:8px 18px;scrollbar-width:none}
+.sugg .s{flex-shrink:0;background:#fff;border:1.5px solid var(--mint);color:var(--green);border-radius:20px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer}
+.chatinput{position:absolute;bottom:86px;left:0;right:0;padding:10px 18px;display:flex;gap:10px;background:linear-gradient(transparent,var(--bg) 40%)}
+.chatinput input{flex:1;border:1.5px solid #e2ece2;border-radius:24px;padding:13px 18px;font-size:13.5px;font-family:inherit;outline:none;background:#fff}
+.chatinput button{width:46px;height:46px;border-radius:50%;background:var(--green);color:#fff;border:none;font-size:17px;cursor:pointer}
+.typing{display:inline-flex;gap:4px;padding:4px 2px}
+.typing i{width:7px;height:7px;border-radius:50%;background:#b9c9be;animation:ty 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes ty{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+/* ==== CART ==== */
+.citem{display:flex;gap:12px;background:#fff;border:1px solid #ecf2ec;border-radius:16px;padding:12px;margin:0 20px 10px;align-items:center}
+.citem img{width:58px;height:58px;object-fit:contain;background:#f7faf7;border-radius:12px;padding:4px}
+.citem .t{font-size:12.5px;font-weight:700;line-height:1.35}
+.citem .p{font-size:14px;font-weight:800;color:var(--green);margin-top:3px}
+.citem .qty{margin-left:auto;display:flex;align-items:center;gap:10px;background:#f2f7f2;border-radius:12px;padding:6px 10px;font-weight:800;font-size:13px}
+.citem .qty button{border:none;background:none;font-size:15px;font-weight:800;color:var(--green);cursor:pointer}
+.gain{margin:6px 20px 10px;background:linear-gradient(120deg,#fff8e8,#fdf3d5);border:1px solid #f3e2ad;border-radius:16px;padding:13px 14px;font-size:12.5px;font-weight:700;color:#7a5b00;display:flex;gap:9px;align-items:center}
+.shipbar{margin:0 20px 12px;background:#fff;border:1px solid #ecf2ec;border-radius:16px;padding:13px 14px}
+.shipbar .lbl{font-size:12px;font-weight:700;color:var(--ink2)}
+.shipbar .lbl b{color:var(--green)}
+.bar{height:8px;background:#eaf2ea;border-radius:6px;margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;width:78%;background:linear-gradient(90deg,var(--leaf2),var(--leaf));border-radius:6px}
+.promo{margin:0 20px 10px;display:flex;gap:8px}
+.promo input{flex:1;border:1.5px dashed #cfdccf;border-radius:14px;padding:12px 14px;font-size:12.5px;font-family:inherit;outline:none;background:#fff}
+.promo button{background:var(--mint-soft);color:var(--green);border:none;border-radius:14px;padding:0 18px;font-weight:800;font-size:12.5px;cursor:pointer;font-family:inherit}
+.paycards{margin:2px 20px 12px;background:#fff;border:1px solid #ecf2ec;border-radius:16px;padding:13px 14px}
+.paycards .lbl{font-size:11px;font-weight:800;color:#93a398;text-transform:uppercase;letter-spacing:.4px}
+.paylogos{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.paylogo{font-size:10.5px;font-weight:800;border:1.5px solid #e7efe7;border-radius:9px;padding:5px 9px;color:var(--ink2)}
+.paylogo.hot{border-color:var(--leaf2);color:var(--green);background:var(--mint-soft)}
+/* hesap */
+.acct-head{margin:10px 20px;background:#fff;border:1px solid #ecf2ec;border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center;cursor:pointer}
+.avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--leaf));color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex-shrink:0}
+.menu{margin:0 20px 14px;background:#fff;border:1px solid #ecf2ec;border-radius:18px;overflow:hidden}
+.mi{display:flex;align-items:center;gap:12px;padding:14px 16px;font-size:13.5px;font-weight:700;border-bottom:1px solid #f2f6f2;cursor:pointer}
+.mi:last-child{border-bottom:none}
+.mi .mic{width:34px;height:34px;border-radius:10px;background:var(--mint-soft);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.mi .chev{margin-left:auto;color:#b9c9be}
+.mi small{display:block;font-size:10.5px;color:#93a398;font-weight:600;margin-top:1px}
+/* login */
+.login{padding:90px 26px 30px;display:flex;flex-direction:column;position:absolute;inset:0;overflow-y:auto}
+.login h1{font-size:23px;font-weight:800;line-height:1.3;margin-top:22px}
+.login .lead{font-size:13px;color:var(--ink2);margin-top:8px;line-height:1.55}
+.login input{border:1.5px solid #e2ece2;border-radius:14px;padding:15px 16px;font-size:14px;font-family:inherit;outline:none;background:#fff;margin-top:18px}
+.sso{display:flex;gap:10px;margin-top:14px}
+.sso button{flex:1;border:1.5px solid #e2ece2;background:#fff;border-radius:14px;padding:13px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
+.orline{display:flex;align-items:center;gap:12px;margin-top:18px;color:#b9c9be;font-size:11px;font-weight:700}
+.orline::before,.orline::after{content:"";flex:1;height:1px;background:#e2ece2}
+/* siparişler */
+.ordcard{margin:0 20px 12px;background:#fff;border:1px solid #ecf2ec;border-radius:18px;padding:15px}
+.ordcard .oh{display:flex;align-items:center;font-size:12.5px;font-weight:800}
+.ordcard .oh .ost{margin-left:auto;font-size:10px;padding:4px 9px;border-radius:9px;font-weight:800}
+.ost.ship{background:#eef4ff;color:#2456b8}.ost.done{background:var(--mint-soft);color:var(--green)}
+.ordcard .oim{display:flex;gap:8px;margin-top:10px}
+.ordcard .oim img{width:44px;height:44px;object-fit:contain;background:#f7faf7;border-radius:10px;padding:4px}
+.steps{display:flex;margin-top:12px;gap:4px}
+.steps .st{flex:1;text-align:center;font-size:9px;font-weight:700;color:#93a398}
+.steps .st i{display:block;height:5px;border-radius:3px;background:#eaf2ea;margin-bottom:5px}
+.steps .st.on{color:var(--green)}
+.steps .st.on i{background:var(--leaf)}
+/* adresler */
+.addr{margin:0 20px 10px;background:#fff;border:1.5px solid #ecf2ec;border-radius:16px;padding:14px;position:relative}
+.addr.def{border-color:var(--leaf2)}
+.addr .tagd{position:absolute;top:12px;right:12px;font-size:9px;font-weight:800;background:var(--mint-soft);color:var(--green);padding:3px 8px;border-radius:8px}
+.addr b{font-size:13px}
+.addr p{font-size:11.5px;color:var(--ink2);margin-top:4px;line-height:1.5}
+.addr .aacts{margin-top:8px;font-size:11px;font-weight:700;color:var(--leaf)}
+/* push banner */
+.push{position:absolute;top:14px;left:12px;right:12px;background:rgba(255,255,255,.97);border-radius:18px;box-shadow:0 10px 30px rgba(14,20,17,.25);padding:12px 14px;display:flex;gap:11px;align-items:center;z-index:95;transform:translateY(-140%);transition:.5s cubic-bezier(.2,.8,.25,1);cursor:pointer}
+.push.show{transform:none}
+.push .appic{width:38px;height:38px;border-radius:10px;background:var(--mint-soft);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.push b{font-size:12.5px;display:block}
+.push p{font-size:11.5px;color:var(--ink2);margin-top:1px;line-height:1.35}
+.push .tm{margin-left:auto;font-size:10px;color:#93a398;align-self:flex-start}
+/* story viewer */
+.storyview{position:absolute;inset:0;z-index:90;display:none;flex-direction:column;color:#fff}
+.storyview.open{display:flex}
+.sv-bars{display:flex;gap:5px;padding:60px 16px 10px}
+.sv-bars i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.3);overflow:hidden;position:relative}
+.sv-bars i b{position:absolute;inset:0;width:0;background:#fff}
+.sv-bars i.done b{width:100%}
+.sv-bars i.cur b{animation:svfill 5s linear forwards}
+@keyframes svfill{from{width:0}to{width:100%}}
+.sv-head{display:flex;align-items:center;gap:10px;padding:8px 16px;font-size:12.5px;font-weight:700}
+.sv-head .x{margin-left:auto;font-size:22px;cursor:pointer;background:none;border:none;color:#fff;padding:2px 6px}
+.sv-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 34px;gap:12px}
+.sv-body .bigem{font-size:74px}
+.sv-body h2{font-size:24px;font-weight:800;line-height:1.3}
+.sv-body p{font-size:14px;opacity:.92;line-height:1.55}
+.sv-cta{margin:0 22px 46px}
+.sv-cta button{width:100%;background:#fff;color:var(--ink);border:none;border-radius:16px;padding:16px;font-size:14.5px;font-weight:800;font-family:inherit;cursor:pointer}
+/* kulüp */
+.lvlhero{margin:10px 20px;background:linear-gradient(130deg,var(--green),#0c6b41);border-radius:22px;padding:20px;color:#fff}
+.lvlhero .em{font-size:38px}
+.lvlhero h2{font-size:20px;font-weight:800;margin-top:6px}
+.lvlhero p{font-size:12px;opacity:.85;margin-top:4px;line-height:1.5}
+.lvlbar{height:9px;background:rgba(255,255,255,.22);border-radius:6px;margin-top:14px;overflow:hidden}
+.lvlbar i{display:block;height:100%;width:64%;background:#fff;border-radius:6px}
+.lvlrow{margin:0 20px 10px;background:#fff;border:1.5px solid #ecf2ec;border-radius:16px;padding:14px;display:flex;gap:12px;align-items:flex-start}
+.lvlrow.cur{border-color:var(--leaf2);background:var(--mint-soft)}
+.lvlrow .em{font-size:24px}
+.lvlrow b{font-size:13.5px;display:block}
+.lvlrow small{font-size:11.5px;color:var(--ink2);line-height:1.5;display:block;margin-top:3px}
+/* bildirimler */
+.notif{margin:0 20px 10px;background:#fff;border:1px solid #ecf2ec;border-radius:16px;padding:13px 14px;display:flex;gap:11px;cursor:pointer;align-items:flex-start}
+.notif .nic{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.notif b{font-size:12.5px;display:block}
+.notif p{font-size:11.5px;color:var(--ink2);margin-top:2px;line-height:1.45}
+.notif .tm{margin-left:auto;font-size:10px;color:#93a398;white-space:nowrap;padding-left:6px}
+/* rutin */
+.rutin{margin:14px 20px 0;background:#fff;border:1.5px solid var(--mint);border-radius:20px;padding:14px}
+.rutin .rh{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:800}
+.rutin .rh .tag{margin-left:auto;font-size:9.5px;background:var(--mint-soft);color:var(--green);padding:3px 8px;border-radius:8px;font-weight:800}
+.rutin .rimgs{display:flex;gap:8px;margin-top:10px;align-items:center}
+.rutin .rimgs img{width:46px;height:46px;object-fit:contain;background:#f7faf7;border-radius:10px;padding:4px}
+.rutin .rimgs .more{font-size:11px;color:#93a398;font-weight:700}
+.rutin .rbtn{margin-top:11px;width:100%;background:var(--green);color:#fff;border:none;border-radius:13px;padding:12px;font-weight:800;font-size:12.5px;font-family:inherit;cursor:pointer}
+/* toast */
+.toast{position:absolute;bottom:104px;left:50%;transform:translate(-50%,20px);background:var(--ink);color:#fff;font-size:12.5px;font-weight:700;padding:11px 18px;border-radius:24px;opacity:0;transition:.3s;z-index:70;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+/* kiler */
+.kcard{margin:0 20px 10px;background:#fff;border:1px solid #ecf2ec;border-radius:16px;padding:13px 14px;display:flex;gap:12px;align-items:center}
+.kcard img{width:52px;height:52px;object-fit:contain;background:#f7faf7;border-radius:12px;padding:4px}
+.kcard .t{font-size:12.5px;font-weight:700}
+.kcard .st{font-size:11px;font-weight:700;margin-top:3px}
+.kcard .st.ok{color:var(--leaf)}
+.kcard .st.warn{color:#c77700}
+.kcard .st.low{color:var(--pink)}
+.kbtn{margin-left:auto;background:var(--green);color:#fff;border:none;border-radius:12px;padding:9px 12px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen-wrap" id="app">
+    <div class="notch"></div>
+    <div class="statusbar"><span>9:41</span><span>􀙇 􀛨 %92</span></div>
+
+    <!-- ONBOARDING -->
+    <section class="scr active" id="s-onboard">
+      <div class="ob">
+        <img class="logo" src="assets/logo.png" alt="Özel Beslenme">
+        <h1>Beslenme <em>kimliğini</em> seç,<br>market sana göre dizilsin.</h1>
+        <p class="lead">4.700 ürünlük marketi senin ihtiyacına göre filtreliyoruz. Vitrin, arama, kampanyalar — her şey profiline uyum sağlar.</p>
+        <div class="grid" id="diets">
+          <div class="diet" data-k="gf"><span class="em">🌾</span>Glutensiz<small>Çölyak & hassasiyet</small></div>
+          <div class="diet" data-k="vg"><span class="em">🌱</span>Vegan<small>Bitkisel beslenme</small></div>
+          <div class="diet" data-k="lf"><span class="em">🥛</span>Laktozsuz<small>Süt intoleransı</small></div>
+          <div class="diet" data-k="lp"><span class="em">🧬</span>Düşük Proteinli<small>PKU</small></div>
+          <div class="diet" data-k="db"><span class="em">🍬</span>Şekersiz<small>Diyabetik</small></div>
+          <div class="diet" data-k="sp"><span class="em">💪</span>Sporcu<small>Protein & performans</small></div>
+        </div>
+        <h3>Alerjilerin var mı?</h3>
+        <div class="alg" id="allergens">
+          <span class="a">🥜 Yer fıstığı</span><span class="a">🌰 Fındık</span><span class="a">🥚 Yumurta</span><span class="a">🫘 Soya</span><span class="a">🌊 Susam</span>
+        </div>
+        <div class="cta">
+          <button class="btn-p" onclick="finishOnboarding()">Marketimi Kur ✨</button>
+          <button class="btn-ghost" onclick="finishOnboarding(true)">Şimdilik atla</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOME -->
+    <section class="scr" id="s-home">
+      <div class="hdr">
+        <img class="logo" src="assets/logo.png" alt="Özel Beslenme">
+        <div class="spacer"></div>
+        <div class="iconbtn" onclick="go(loggedIn?'s-hesap':'s-giris')">👤</div>
+        <div class="iconbtn" style="position:relative" onclick="go('s-bildirim')">🔔<span class="badge-cart" style="position:absolute;top:-5px;right:-5px;margin:0">4</span></div>
+      </div>
+      <div class="scroll">
+        <div class="searchbar" onclick="go('s-category')">🔍 Ürün, marka veya ihtiyaç ara… <span class="ai-tag">Boost AI</span></div>
+        <div class="stories">
+          <div class="story" onclick="openStory(1)"><div class="ring"><div class="inner">⚡</div></div>Flaş Fırsat</div>
+          <div class="story" onclick="openStory(0)"><div class="ring"><div class="inner">🧑‍🍳</div></div>Tarifler</div>
+          <div class="story" onclick="openStory(2)"><div class="ring"><div class="inner">✨</div></div>Yeni</div>
+          <div class="story" onclick="toast('Story: blog içerikleri')"><div class="ring"><div class="inner">📖</div></div>Blog</div>
+          <div class="story" onclick="toast('CrazyRocket çark — app’e özel')"><div class="ring"><div class="inner">🎡</div></div>Çark</div>
+        </div>
+        <div class="greet" id="greet"></div>
+        <div class="quick">
+          <div class="qa" onclick="go('s-scan')"><div class="qic">📷</div>Barkod Tara<span class="new">YENİ</span></div>
+          <div class="qa" onclick="go('s-ai')"><div class="qic">✨</div>AI Asistan<span class="new">YENİ</span></div>
+          <div class="qa" onclick="go('s-kiler')"><div class="qic">🧺</div>Akıllı Kiler<span class="new">YENİ</span></div>
+        </div>
+        <div id="rutinbox"></div>
+        <h2 class="sec">Senin İçin Seçtik <span id="foryou-tag" style="font-size:10px;background:var(--mint-soft);color:var(--green);padding:3px 8px;border-radius:8px;font-weight:800"></span><span class="all">Tümü ›</span></h2>
+        <div class="shelf" id="shelf-foryou"></div>
+        <div class="flash" onclick="toast('414 indirimli ürün — web ile senkron')">
+          <div class="fl">⚡</div>
+          <div class="ft"><b>FLAŞ İNDİRİMLER</b><span>Sadece app’e özel ekstra %5</span></div>
+          <div class="timer" id="timer">04:32:11</div>
+        </div>
+        <h2 class="sec">Flaş İndirimler <span class="all">Tümü ›</span></h2>
+        <div class="shelf" id="shelf-flash"></div>
+        <h2 class="sec">Glutensiz Fırın 🥖 <span class="all">Tümü ›</span></h2>
+        <div class="shelf" id="shelf-bread"></div>
+      </div>
+    </section>
+
+    <!-- CATEGORY -->
+    <section class="scr" id="s-category">
+      <div class="hdr"><button class="back" onclick="go('s-home')">‹</button><b style="font-size:17px">Kategoriler</b></div>
+      <div class="scroll">
+        <div class="searchbar">🔍 4.693 ürün içinde ara… <span class="ai-tag">Boost AI</span></div>
+        <div class="filterline" id="autofilter">🎯 Beslenme profiline göre filtre otomatik açık</div>
+        <div class="catgrid">
+          <div class="cat" onclick="toast('Gerçek sayı: 2.220 glutensiz ürün')"><span class="cem">🌾</span><b>Glutensiz</b><span>2.220 ürün</span></div>
+          <div class="cat" onclick="toast('Vegan koleksiyonu')"><span class="cem">🌱</span><b>Vegan</b><span>1.480 ürün</span></div>
+          <div class="cat" onclick="toast('Anne & Bebek')"><span class="cem">🍼</span><b>Anne & Bebek</b><span>514 ürün</span></div>
+          <div class="cat" onclick="toast('Sporcu ürünleri')"><span class="cem">💪</span><b>Sporcu</b><span>620 ürün</span></div>
+          <div class="cat" onclick="toast('Vitamin & takviye')"><span class="cem">💊</span><b>Vitaminler</b><span>780 ürün</span></div>
+          <div class="cat" onclick="toast('Düşük proteinli — PKU')"><span class="cem">🧬</span><b>Düşük Proteinli</b><span>25 ürün</span></div>
+          <div class="cat" onclick="toast('Glutensiz ekmekler')"><span class="cem">🥖</span><b>Glutensiz Ekmek</b><span>42 ürün</span></div>
+          <div class="cat" onclick="toast('Atıştırmalıklar')"><span class="cem">🍿</span><b>Atıştırmalık</b><span>802 ürün</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCT DETAIL -->
+    <section class="scr" id="s-product">
+      <div class="hdr" style="position:absolute;top:0;left:0;right:0;z-index:30"><button class="back" onclick="go(lastList)">‹</button><div class="spacer"></div><div class="iconbtn" onclick="toast('Mst:Wishlist entegrasyonu ❤️')">🤍</div></div>
+      <div class="scroll" style="padding-bottom:150px">
+        <div class="pd-img" style="padding-top:100px"><img id="pd-img" src="" alt=""></div>
+        <div class="pd-body">
+          <div id="pd-badges" style="display:flex;gap:6px"></div>
+          <div class="pd-brand" id="pd-brand"></div>
+          <h1 id="pd-title"></h1>
+          <div class="stars" style="margin-top:8px">★★★★★ 4.8 <small>· 127 değerlendirme (Judge.me)</small></div>
+          <div class="inforow">
+            <div class="info">📅 SKT: 12.05.2027 · Taze ✓</div>
+            <div class="info">🚚 Yarın kargoda — 18:00’a kadar</div>
+            <div class="info warn">🔔 Stok azalınca haber ver</div>
+          </div>
+          <h3 style="font-size:13px;font-weight:800;margin-top:18px">Çok al, az öde</h3>
+          <div class="qtytiers" id="tiers"></div>
+          <p style="font-size:12.5px;color:var(--ink2);line-height:1.6;margin-top:16px">Ürün açıklaması, içindekiler tablosu, besin değerleri ve kullanım videosu bu alanda zengin içerik olarak gösterilir (webdeki rich text birebir çekilir).</p>
+        </div>
+      </div>
+      <div class="buybar">
+        <div class="tot"><small>Toplam</small><b id="pd-total"></b></div>
+        <button class="btn-p" onclick="addCart()">Sepete Ekle</button>
+      </div>
+    </section>
+
+    <!-- SCAN -->
+    <section class="scr" id="s-scan">
+      <div class="scan">
+        <div class="hdr2"><button class="back" onclick="go('s-home')">‹</button><b>Bu bana uygun mu?</b></div>
+        <div class="viewport">
+          <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+          <div class="scanline" id="scanline"></div>
+        </div>
+        <div class="hint">Herhangi bir marketteki ürünün barkodunu çerçeveye hizala — alerjen ve diyet uyumunu anında söyleyelim.</div>
+      </div>
+      <div class="scanresult" id="scanresult">
+        <div class="match" id="scan-match">✅ &nbsp;Glutensiz — profiline uygun!</div>
+        <div class="sr-prod">
+          <img src="img/b32846ef8f49.png" alt="">
+          <div>
+            <div class="t">BALVİTEN Glutensiz Çubuk Kraker 70g</div>
+            <div class="p">159,90 ₺ <span style="font-size:10.5px;color:#93a398;font-weight:700">· bizde stokta</span></div>
+            <div class="ship">🚚 Yarın kapında</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:16px">
+          <button class="btn-p" style="flex:1" onclick="cartCount++;syncCart();toast('Sepete eklendi 🧺');go('s-home')">Sepete Ekle</button>
+          <button class="btn-ghost" style="width:auto;padding:14px 18px" onclick="restartScan()">Yeni Tara</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI ASSISTANT -->
+    <section class="scr" id="s-ai">
+      <div class="hdr"><button class="back" onclick="go('s-home')">‹</button><b style="font-size:17px">✨ Beslenme Asistanı</b><div class="spacer"></div><span style="font-size:9.5px;background:var(--mint-soft);color:var(--green);font-weight:800;padding:4px 8px;border-radius:8px">CLAUDE AI</span></div>
+      <div class="chat" id="chat"></div>
+      <div class="sugg" id="sugg" style="position:absolute;bottom:146px;left:0;right:0">
+        <span class="s" onclick="aiFlow(3)">✨ Haftalık seçkim</span>
+        <span class="s" onclick="aiFlow(1)">🧁 Glutensiz kek tarifi ver</span>
+        <span class="s" onclick="aiFlow(2)">💪 Protein ihtiyacımı hesapla</span>
+      </div>
+      <div class="chatinput">
+        <input placeholder="Bir şey sor… (ör. okul atıştırmalığı öner)" id="aiinput">
+        <button onclick="aiFlow(0)">➤</button>
+      </div>
+    </section>
+
+    <!-- SMART PANTRY -->
+    <section class="scr" id="s-kiler">
+      <div class="hdr"><button class="back" onclick="go('s-home')">‹</button><b style="font-size:17px">🧺 Akıllı Kiler</b></div>
+      <div class="scroll">
+        <p style="padding:4px 20px 12px;font-size:12.5px;color:var(--ink2);line-height:1.55">Satın aldığın ürünlerin son kullanma tarihini ve tüketim ritmini takip ediyoruz — hiçbir şey bitmesin, hiçbir şey bayatlamasın.</p>
+        <h2 class="sec" style="padding-top:4px">Bitmek üzere 🔁</h2>
+        <div class="kcard">
+          <img src="img/0a53aaaff353.png" alt="">
+          <div><div class="t">SCHAR Pan Multigrano Ekmek</div><div class="st low">Tahmini 2 gün sonra bitiyor</div></div>
+          <button class="kbtn" onclick="cartCount++;syncCart();toast('Yeniden sipariş sepette 🧺')">Yeniden Al</button>
+        </div>
+        <div class="kcard">
+          <img src="img/d2066afa4480.png" alt="">
+          <div><div class="t">ZÜBER %100 Fıstık Ezmesi</div><div class="st warn">~5 gün sonra bitiyor</div></div>
+          <button class="kbtn" onclick="cartCount++;syncCart();toast('Yeniden sipariş sepette 🧺')">Yeniden Al</button>
+        </div>
+        <h2 class="sec">SKT yaklaşanlar 📅</h2>
+        <div class="kcard">
+          <img src="img/29f5ce18bd91.png" alt="">
+          <div><div class="t">SCHAR Petibör Bisküvi</div><div class="st warn">SKT: 14 gün kaldı — önce bunu tüket</div></div>
+        </div>
+        <div class="kcard">
+          <img src="img/4d1fb0b2b45e.png" alt="">
+          <div><div class="t">İHE Glutensiz Ekmek 50g</div><div class="st ok">SKT: 2 ay — sorun yok ✓</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CART -->
+    <section class="scr" id="s-cart">
+      <div class="hdr"><button class="back" onclick="go('s-home')">‹</button><b style="font-size:17px">Sepetim</b></div>
+      <div class="scroll">
+        <div id="cartitems"></div>
+        <div class="gain" onclick="go('s-kulup')">🏆<span>Bu sepetten <b>86 puan</b> kazanıyorsun — <b>Fidan 🌿</b> seviyesindesin</span><span style="margin-left:auto">›</span></div>
+        <div class="shipbar">
+          <div class="lbl">Ücretsiz kargoya <b>150 ₺</b> kaldı 🚚</div>
+          <div class="bar"><i></i></div>
+        </div>
+        <div class="promo"><input placeholder="🎟️ İndirim kodu"><button>Uygula</button></div>
+        <div class="promo"><input placeholder="📝 Sipariş notu ekle…"></div>
+        <div class="promo"><button style="flex:1;padding:13px;background:#fff;border:1.5px dashed var(--leaf2);color:var(--green);border-radius:14px" onclick="saveRoutine()">🔁 Bu sepeti aylık rutinim yap</button></div>
+        <div class="paycards">
+          <div class="lbl">Ödeme Yöntemleri</div>
+          <div class="paylogos">
+            <span class="paylogo">💳 Kart</span>
+            <span class="paylogo hot">Edenred</span>
+            <span class="paylogo hot">Pluxee</span>
+            <span class="paylogo hot">Multinet</span>
+            <span class="paylogo hot">Setcard</span>
+            <span class="paylogo">+3</span>
+          </div>
+          <div style="font-size:10.5px;color:#93a398;font-weight:600;margin-top:8px">Yemek kartları webdeki gibi aynen çalışır — Shopify checkout</div>
+        </div>
+        <div style="margin:6px 20px 60px;display:flex;align-items:center;gap:14px">
+          <div><small style="font-size:10.5px;color:#93a398;font-weight:700;display:block">Toplam</small><b style="font-size:21px;color:var(--green)" id="carttotal">0 ₺</b></div>
+          <button class="btn-p" style="flex:1" onclick="toast('Mesafeli satış sözleşmesi + ön bilgilendirme → checkout')">Ödemeye Geç →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- GİRİŞ -->
+    <section class="scr" id="s-giris">
+      <div class="login">
+        <img src="assets/logo.png" alt="Özel Beslenme" style="height:38px;align-self:flex-start">
+        <h1>Giriş yap ya da<br>hesap oluştur</h1>
+        <p class="lead">Webdeki hesabınla aynı — sipariş geçmişin, adreslerin ve puanların seni bekliyor. Şifre yok: e-postana <b>tek kullanımlık kod</b> göndeririz.</p>
+        <input placeholder="E-posta adresin">
+        <button class="btn-p" style="margin-top:14px" onclick="loggedIn=true;go('s-hesap');toast('6 haneli kod doğrulandı ✓ Hoş geldin İsmail!')">Kod Gönder →</button>
+        <p style="font-size:10.5px;color:#93a398;font-weight:600;margin-top:10px;text-align:center">Konsept demo — kod gerçekten gönderilmez, dokunmanız yeterli 🙂</p>
+        <div class="orline">veya</div>
+        <div class="sso">
+          <button onclick="loggedIn=true;go('s-hesap');toast('Apple ile giriş yapıldı ✓')">🍎 Apple ile devam</button>
+          <button onclick="loggedIn=true;go('s-hesap');toast('Google ile giriş yapıldı ✓')">G&nbsp; Google ile devam</button>
+        </div>
+        <p style="font-size:10.5px;color:#93a398;font-weight:600;margin-top:auto;padding-top:24px;line-height:1.5">Devam ederek Üyelik Koşulları ve KVKK Aydınlatma Metni'ni kabul etmiş olursun.</p>
+      </div>
+    </section>
+
+    <!-- HESABIM -->
+    <section class="scr" id="s-hesap">
+      <div class="hdr"><button class="back" onclick="go('s-home')">‹</button><b style="font-size:17px">Hesabım</b></div>
+      <div class="scroll">
+        <div class="acct-head" onclick="go('s-kulup')">
+          <div class="avatar">İY</div>
+          <div><b style="font-size:15px">İsmail Yılmaz</b><div style="font-size:11.5px;color:#93a398;font-weight:600;margin-top:2px">ismail@ornek.com</div>
+          <div style="font-size:10.5px;color:var(--green);font-weight:800;margin-top:4px">🌿 Fidan Kulübü · 1.240 puan ›</div></div>
+        </div>
+        <div class="menu">
+          <div class="mi" onclick="go('s-siparis')"><div class="mic">📦</div><div>Siparişlerim<small>1 sipariş yolda 🚚</small></div><span class="chev">›</span></div>
+          <div class="mi" onclick="go('s-adres')"><div class="mic">📍</div><div>Adreslerim<small>2 kayıtlı adres</small></div><span class="chev">›</span></div>
+          <div class="mi" onclick="go('s-onboard')"><div class="mic">🌾</div><div>Beslenme Kimliğim<small>Glutensiz · 1 alerjen</small></div><span class="chev">›</span></div>
+          <div class="mi" onclick="toast('Mst:Wishlist — favoriler')"><div class="mic">❤️</div><div>Favorilerim<small>6 ürün</small></div><span class="chev">›</span></div>
+          <div class="mi" onclick="go('s-rutinbilgi')"><div class="mic">🔁</div><div>Aylık Rutinim<small>3 ürün · her ayın 1'i</small></div><span class="chev">›</span></div>
+        </div>
+        <div class="menu">
+          <div class="mi" onclick="toast('Bildirim tercihleri: kampanya / sipariş / seçki ayrı ayrı açılıp kapanır')"><div class="mic">🔔</div><div>Bildirim Tercihlerim</div><span class="chev">›</span></div>
+          <div class="mi" onclick="toast('Kuponlarım — LoyaltyLion')"><div class="mic">🎟️</div><div>Kuponlarım<small>2 aktif kupon</small></div><span class="chev">›</span></div>
+          <div class="mi" onclick="toast('WhatsApp destek hattına bağlanır 💬')"><div class="mic">💬</div><div>Canlı Destek</div><span class="chev">›</span></div>
+          <div class="mi" onclick="loggedIn=false;go('s-home');toast('Çıkış yapıldı')"><div class="mic" style="background:#fdeef5">🚪</div><div style="color:var(--pink)">Çıkış Yap</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SİPARİŞLERİM -->
+    <section class="scr" id="s-siparis">
+      <div class="hdr"><button class="back" onclick="go('s-hesap')">‹</button><b style="font-size:17px">📦 Siparişlerim</b></div>
+      <div class="scroll">
+        <div class="ordcard">
+          <div class="oh">#28471 · 21 Eylül <span class="ost ship">🚚 Dağıtımda</span></div>
+          <div class="oim"><img src="img/0a53aaaff353.png"><img src="img/d2066afa4480.png"><span style="font-size:11px;color:#93a398;font-weight:700;align-self:center">+2 ürün · 934,80 ₺</span></div>
+          <div class="steps">
+            <div class="st on"><i></i>Hazırlandı</div><div class="st on"><i></i>Kargoda</div><div class="st on"><i></i>Dağıtımda</div><div class="st"><i></i>Teslim</div>
+          </div>
+          <button class="rbtn" style="margin-top:12px;width:100%;background:var(--mint-soft);color:var(--green);border:none;border-radius:12px;padding:11px;font-weight:800;font-size:12px;font-family:inherit;cursor:pointer" onclick="toast('Aras Kargo canlı takip — kilit ekranında da 🚚')">Kargoyu Canlı Takip Et</button>
+        </div>
+        <div class="ordcard">
+          <div class="oh">#28104 · 3 Eylül <span class="ost done">✓ Teslim edildi</span></div>
+          <div class="oim"><img src="img/4d1fb0b2b45e.png"><span style="font-size:11px;color:#93a398;font-weight:700;align-self:center">+4 ürün · 612,40 ₺</span></div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button style="flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:11px;font-weight:800;font-size:12px;font-family:inherit;cursor:pointer" onclick="cartCount+=5;syncCart();toast('5 ürün sepete eklendi 🔁')">Tekrar Sipariş Ver</button>
+            <button style="flex:1;background:#fff;border:1.5px solid #e2ece2;border-radius:12px;padding:11px;font-weight:800;font-size:12px;font-family:inherit;cursor:pointer;color:var(--ink2)" onclick="toast('Judge.me — yorum +50 puan kazandırır ⭐')">Değerlendir (+50 puan)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADRESLERİM -->
+    <section class="scr" id="s-adres">
+      <div class="hdr"><button class="back" onclick="go('s-hesap')">‹</button><b style="font-size:17px">📍 Adreslerim</b></div>
+      <div class="scroll">
+        <p style="padding:2px 20px 12px;font-size:11.5px;color:#93a398;font-weight:600">Adresler webdeki hesabınla ortak — birinde eklersen ikisinde de görünür.</p>
+        <div class="addr def">
+          <span class="tagd">VARSAYILAN</span>
+          <b>🏠 Ev</b>
+          <p>İsmail Yılmaz · 0532 *** ** 41<br>Acıbadem Mah. Gülden Sok. No:12 D:5<br>Kadıköy / İstanbul</p>
+          <div class="aacts" onclick="toast('Adres düzenleme formu açılır')">Düzenle</div>
+        </div>
+        <div class="addr">
+          <b>🏢 İş</b>
+          <p>İsmail Yılmaz · 0532 *** ** 41<br>Esentepe Mah. Büyükdere Cad. No:201 K:14<br>Şişli / İstanbul</p>
+          <div class="aacts" onclick="toast('Adres düzenleme formu açılır')">Düzenle · Varsayılan yap</div>
+        </div>
+        <div style="margin:14px 20px"><button class="btn-p" style="box-shadow:none" onclick="toast('Yeni adres formu: il/ilçe seçimli, haritadan konum destekli')">+ Yeni Adres Ekle</button></div>
+      </div>
+    </section>
+
+    <!-- RUTİN DETAY -->
+    <section class="scr" id="s-rutinbilgi">
+      <div class="hdr"><button class="back" onclick="go('s-hesap')">‹</button><b style="font-size:17px">🔁 Aylık Rutinim</b></div>
+      <div class="scroll"><div id="rutinbox2" style="margin-top:4px"></div>
+        <p style="padding:8px 24px;font-size:12px;color:var(--ink2);line-height:1.6">Rutinini istediğin sepetten güncelleyebilirsin: sepette "Bu sepeti aylık rutinim yap"a dokunman yeterli. Hatırlatma gününü değiştirmek için: <b style="color:var(--green)">her ayın 1'i ▾</b></p>
+      </div>
+    </section>
+
+    <!-- KULÜP -->
+    <section class="scr" id="s-kulup">
+      <div class="hdr"><button class="back" onclick="go('s-home')">‹</button><b style="font-size:17px">🌿 Özel Kulüp</b><div class="spacer"></div><span style="font-size:9.5px;background:var(--mint-soft);color:var(--green);font-weight:800;padding:4px 8px;border-radius:8px">LOYALTYLION</span></div>
+      <div class="scroll">
+        <div class="lvlhero">
+          <div class="em">🌿</div>
+          <h2>Fidan seviyesindesin</h2>
+          <p><b>1.240 puan</b> · Çınar 🌳 seviyesine <b>760 puan</b> kaldı — yaklaşık 2 sipariş!</p>
+          <div class="lvlbar"><i></i></div>
+        </div>
+        <h2 class="sec" style="padding-top:8px">Seviyeler ve ayrıcalıklar</h2>
+        <div class="lvlrow"><span class="em">🌱</span><div><b>Tohum — başlangıç</b><small>Her siparişte puan · doğum günü kuponu</small></div></div>
+        <div class="lvlrow cur"><span class="em">🌿</span><div><b>Fidan — sen buradasın ✓</b><small>Ücretsiz kargo eşiği 400₺ yerine <b>300₺</b> · kampanyalara 1 saat erken erişim</small></div></div>
+        <div class="lvlrow"><span class="em">🌳</span><div><b>Çınar — 2.000 puan</b><small>Ücretsiz kargo eşiği <b>200₺</b> · Glutensiz Cuma'ya 24 saat erken erişim · yılda 2 sürpriz kutu</small></div></div>
+        <div style="margin:14px 20px;background:var(--mint-soft);border-radius:16px;padding:14px;font-size:12px;color:var(--green);font-weight:700;line-height:1.55">💡 Puan kazanmanın yolları: sipariş (1₺ = 1 puan) · arkadaş daveti (+100) · yorum yazma (+50) · profili tamamlama (+25)</div>
+      </div>
+    </section>
+
+    <!-- BİLDİRİMLER -->
+    <section class="scr" id="s-bildirim">
+      <div class="hdr"><button class="back" onclick="go('s-home')">‹</button><b style="font-size:17px">🔔 Bildirimler</b></div>
+      <div class="scroll">
+        <p style="padding:2px 20px 12px;font-size:11.5px;color:#93a398;font-weight:600">Geçmiş bildirimler — segment bazlı gönderim panelden yönetilir</p>
+        <div class="notif" onclick="go('s-cart')"><div class="nic" style="background:#fdeef5">🧺</div><div><b>Sepetin seni bekliyor</b><p>Schar Pan Multigrano sepetinde kaldı — stokta son 8 adet!</p></div><span class="tm">12 dk</span></div>
+        <div class="notif" onclick="go('s-ai');setTimeout(()=>aiFlow(3),400)"><div class="nic" style="background:var(--mint-soft)">✨</div><div><b>Haftalık seçkin hazır</b><p>AI asistanın bu hafta senin için 3 ürün seçti — profiline özel.</p></div><span class="tm">2 sa</span></div>
+        <div class="notif" onclick="openProduct(PRODUCTS.filter(p=>p.o)[0].id)"><div class="nic" style="background:#fff6e5">📉</div><div><b>Favorindeki ürün indirimde!</b><p>Wishlist'indeki Orzax Cosakondrin şimdi %13 indirimli.</p></div><span class="tm">1 gün</span></div>
+        <div class="notif" onclick="toast('Canlı kargo takibi — Live Activity 🚚')"><div class="nic" style="background:#eef4ff">🚚</div><div><b>Siparişin dağıtımda</b><p>#28471 nolu siparişin bugün teslim edilecek.</p></div><span class="tm">2 gün</span></div>
+        <div class="notif" onclick="openStory(1)"><div class="nic" style="background:#fdeef5">⚡</div><div><b>Glutensiz Cuma başladı!</b><p>Sadece app'e özel %25'e varan indirimler — 6 saat geçerli.</p></div><span class="tm">4 gün</span></div>
+      </div>
+    </section>
+
+    <!-- STORY VIEWER -->
+    <div class="storyview" id="storyview">
+      <div class="sv-bars" id="sv-bars"></div>
+      <div class="sv-head"><span id="sv-src">Özel Beslenme</span><button class="x" onclick="closeStory()">✕</button></div>
+      <div class="sv-body" id="sv-body"></div>
+      <div class="sv-cta"><button id="sv-cta" onclick="storyCTA()"></button></div>
+      <div class="sv-tap" style="left:0" onclick="prevStorySlide()"></div>
+      <div class="sv-tap" style="right:0" onclick="nextStorySlide()"></div>
+    </div>
+
+    <!-- PUSH BANNER -->
+    <div class="push" id="push" onclick="pushTap()">
+      <div class="appic">🌿</div>
+      <div><b id="push-t"></b><p id="push-b"></p></div>
+      <span class="tm">şimdi</span>
+    </div>
+
+    <!-- TABBAR -->
+    <nav class="tabbar" id="tabbar" style="display:none">
+      <button class="tab on" data-s="s-home" onclick="go('s-home')"><span class="ic">🏠</span>Ana Sayfa</button>
+      <button class="tab" data-s="s-category" onclick="go('s-category')"><span class="ic">🗂️</span>Kategoriler</button>
+      <div class="tab-fab"><div class="fab" onclick="go('s-scan')">📷</div></div>
+      <button class="tab" data-s="s-ai" onclick="go('s-ai')"><span class="ic">✨</span>Asistan</button>
+      <button class="tab" data-s="s-cart" onclick="go('s-cart')"><span class="ic">🧺</span>Sepet<span class="badge-cart" id="cartbadge" style="display:none">0</span></button>
+    </nav>
+
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+<div class="stage-note"><b>ÖZEL BESLENME APP v2</b> · Konsept Prototip · bovevo — gerçek ürün & fiyat verisiyle (ozelbeslenme.com API)</div>
+
+<script src="products.js"></script>
+<script>
+/* ---------- STATE ---------- */
+const state={profile:[],allergens:[]};
+let cartCount=0, cartItems=[], lastList='s-home', curProd=null, curTier=1, loggedIn=false;
+const DIETNAMES={gf:'Glutensiz',vg:'Vegan',lf:'Laktozsuz',lp:'Düşük Proteinli',db:'Şekersiz',sp:'Sporcu'};
+const fmt=n=>n.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' ₺';
+
+/* ---------- NAV ---------- */
+let prevScreen=null, abandonShown=false;
+function go(id){
+  const cur=document.querySelector('.scr.active'); prevScreen=cur?cur.id:null;
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.s===id));
+  document.getElementById('tabbar').style.display = id==='s-onboard'||id==='s-scan' ? 'none':'flex';
+  if(id==='s-scan') startScan();
+  if(id==='s-ai' && !document.getElementById('chat').children.length) aiIntro();
+  if(id==='s-cart') renderCart();
+  if(['s-home','s-category'].includes(id)) lastList=id;
+  if(id==='s-rutinbilgi') document.getElementById('rutinbox2').innerHTML=document.getElementById('rutinbox').innerHTML;
+  /* sepet terk simülasyonu: sepetten dolu çıkınca 6 sn sonra push */
+  if(prevScreen==='s-cart' && id!=='s-cart' && cartCount>0 && !abandonShown){
+    abandonShown=true;
+    setTimeout(()=>showPush('Sepetin seni bekliyor 🧺','Ürünlerin hâlâ sepetinde — stokta son 8 adet!','s-cart'),6000);
+  }
+}
+function toast(m){
+  const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');
+  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* ---------- ONBOARDING ---------- */
+document.querySelectorAll('#diets .diet').forEach(d=>d.onclick=()=>{
+  d.classList.toggle('sel');
+  state.profile=[...document.querySelectorAll('#diets .sel')].map(x=>x.dataset.k);
+});
+document.querySelectorAll('#allergens .a').forEach(a=>a.onclick=()=>a.classList.toggle('sel'));
+function finishOnboarding(skip){
+  if(skip) state.profile=[];
+  renderHome(); go('s-home');
+  if(!skip&&state.profile.length) toast('Marketin kişiselleştirildi ✨');
+}
+
+/* ---------- HOME ---------- */
+function matchesProfile(p){
+  if(!state.profile.length) return true;
+  const map={gf:'Glutensiz Ürünler',vg:'Vegan Ürünler',lp:'Düşük Proteinli Ürünler',sp:'Sporcu Ürünleri'};
+  return state.profile.some(k=>map[k]&&p.tags.includes(map[k]));
+}
+function dispTitle(p){
+  const norm=s=>s.replace(/İ/g,'I').replace(/ı/g,'i').toUpperCase();
+  let t=p.t;
+  if(p.b && norm(t).startsWith(norm(p.b))) t=t.slice(p.b.length).trim();
+  return t||p.t;
+}
+function card(p){
+  const d=p.o?Math.round((1-p.p/p.o)*100):0;
+  return `<div class="pcard" onclick="openProduct(${p.id})">
+    ${d?`<span class="disc">-%${d}</span>`:''}
+    <span class="bds">${p.bd.map(b=>`<span class="bd ${b}">${b==='GF'?'GLUTENSİZ':b==='VG'?'VEGAN':b==='LP'?'DÜŞÜK PRO':'ORGANİK'}</span>`).join('')}</span>
+    <img class="pimg" src="${p.img}" loading="lazy" alt="">
+    <div class="pb">${p.b}</div><div class="pt">${dispTitle(p)}</div>
+    <div class="pr"><span class="now">${fmt(p.p)}</span>${p.o?`<span class="old">${fmt(p.o)}</span>`:''}</div>
+    <button class="add" onclick="event.stopPropagation();quickAdd(${p.id})">+</button>
+  </div>`;
+}
+function renderHome(){
+  const names=state.profile.map(k=>DIETNAMES[k]);
+  document.getElementById('greet').innerHTML = names.length
+    ? `<div class="hi">Merhaba İsmail 👋</div><div class="sub">${names.join(' + ')} vitrinin hazır — 4.693 ürün profiline göre filtrelendi.</div><div class="chips">${names.map(n=>`<span class="chip-mini">✓ ${n}</span>`).join('')}<span class="chip-mini" onclick="go('s-kulup')" style="cursor:pointer">🌿 Fidan Kulübü · 1.240 puan ›</span></div>`
+    : `<div class="hi">Merhaba 👋</div><div class="sub">Beslenme kimliğini seçersen marketi sana göre dizeriz.</div><div class="chips"><span class="chip-mini" onclick="go('s-onboard')" style="cursor:pointer">+ Profil oluştur</span><span class="chip-mini" onclick="go('s-kulup')" style="cursor:pointer">🌿 Kulüp ›</span></div>`;
+  document.getElementById('foryou-tag').textContent = names.length? names.join(' · ') : 'ÇOK SATANLAR';
+  const foryou=PRODUCTS.filter(matchesProfile).slice(0,8);
+  document.getElementById('shelf-foryou').innerHTML=(foryou.length?foryou:PRODUCTS.slice(0,8)).map(card).join('');
+  document.getElementById('shelf-flash').innerHTML=PRODUCTS.filter(p=>p.o).slice(0,8).map(card).join('');
+  document.getElementById('shelf-bread').innerHTML=PRODUCTS.filter(p=>p.col==='glutensiz-ekmekler').slice(0,8).map(card).join('');
+  renderRoutine();
+  document.getElementById('autofilter').innerHTML= names.length
+    ? `🎯 <b>${names.join(' + ')}</b>&nbsp;filtren otomatik açık — her kategoride sadece sana uygun ürünler`
+    : `🎯 Profil seçersen filtreler otomatik uygulanır`;
+}
+/* countdown */
+setInterval(()=>{
+  const el=document.getElementById('timer');if(!el)return;
+  let[h,m,s]=el.textContent.split(':').map(Number);s--;
+  if(s<0){s=59;m--}if(m<0){m=59;h--}if(h<0){h=4;m=32;s=11}
+  el.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+},1000);
+
+/* ---------- PRODUCT ---------- */
+function openProduct(id){
+  curProd=PRODUCTS.find(p=>p.id===id);curTier=1;
+  document.getElementById('pd-img').src=curProd.img.replace('width=400','width=600');
+  document.getElementById('pd-title').textContent=dispTitle(curProd);
+  document.getElementById('pd-brand').textContent=curProd.b;
+  document.getElementById('pd-badges').innerHTML=curProd.bd.map(b=>`<span class="bd ${b}" style="font-size:10px;padding:4px 9px">${b==='GF'?'GLUTENSİZ':b==='VG'?'VEGAN':b==='LP'?'DÜŞÜK PROTEİNLİ':'ORGANİK'}</span>`).join('');
+  renderTiers(); go('s-product');
+}
+function renderTiers(){
+  const t=[[1,0],[3,5],[5,10]];
+  document.getElementById('tiers').innerHTML=t.map(([q,d],i)=>`
+    <div class="tier ${q===curTier?'sel':''}" onclick="curTier=${q};renderTiers()">
+      <b>${q} al</b><small>${fmt(curProd.p*(1-d/100))}/adet</small>
+      ${d?`<span class="save">%${d} kazanç</span>`:'<span class="save">&nbsp;</span>'}
+    </div>`).join('');
+  const d={1:0,3:5,5:10}[curTier];
+  document.getElementById('pd-total').textContent=fmt(curProd.p*curTier*(1-d/100));
+}
+function addCart(){
+  cartItems.push({...curProd,qty:curTier});cartCount+=curTier;syncCart();
+  toast(`${curTier} adet sepete eklendi 🧺`);go(lastList);
+}
+function quickAdd(id){
+  const p=PRODUCTS.find(x=>x.id===id);cartItems.push({...p,qty:1});cartCount++;syncCart();toast('Sepete eklendi 🧺');
+}
+function syncCart(){
+  const b=document.getElementById('cartbadge');
+  b.style.display=cartCount?'flex':'none';b.textContent=cartCount;
+}
+function renderCart(){
+  const el=document.getElementById('cartitems');
+  if(!cartItems.length){
+    cartItems=[{...PRODUCTS.find(p=>p.col==='glutensiz-ekmekler')||PRODUCTS[0],qty:1},{...PRODUCTS.filter(p=>p.o)[0],qty:1}];
+    cartCount=2;syncCart();
+  }
+  el.innerHTML=cartItems.map((c,i)=>`
+    <div class="citem"><img src="${c.img}" alt=""><div><div class="t">${c.t.slice(0,42)}${c.t.length>42?'…':''}</div><div class="p">${fmt(c.p*c.qty)}</div></div>
+    <div class="qty"><button onclick="chQty(${i},-1)">−</button>${c.qty}<button onclick="chQty(${i},1)">+</button></div></div>`).join('');
+  document.getElementById('carttotal').textContent=fmt(cartItems.reduce((s,c)=>s+c.p*c.qty,0));
+}
+function chQty(i,d){
+  cartItems[i].qty+=d;cartCount+=d;
+  if(cartItems[i].qty<1){cartCount-=cartItems[i].qty;cartItems.splice(i,1)}
+  if(cartCount<0)cartCount=0;syncCart();renderCart();
+}
+
+/* ---------- SCAN ---------- */
+let scanTimer;
+function startScan(){
+  document.getElementById('scanresult').classList.remove('show');
+  clearTimeout(scanTimer);
+  scanTimer=setTimeout(()=>{
+    const m=document.getElementById('scan-match');
+    const hasAllergen=document.querySelectorAll('#allergens .sel').length>0;
+    m.innerHTML= hasAllergen
+      ? '✅ &nbsp;Glutensiz ✓ · Alerjenlerinle çakışma yok ✓'
+      : '✅ &nbsp;Glutensiz — profiline uygun!';
+    document.getElementById('scanresult').classList.add('show');
+  },2200);
+}
+function restartScan(){startScan()}
+
+/* ---------- AI ---------- */
+const chatEl=()=>document.getElementById('chat');
+function bubble(html,who){const d=document.createElement('div');d.className='msg '+who;d.innerHTML=html;chatEl().appendChild(d);chatEl().scrollTop=1e6;return d}
+function typing(){return bubble('<span class="typing"><i></i><i></i><i></i></span>','bot')}
+function aiProducts(list){
+  const w=document.createElement('div');w.className='aiprods';
+  w.innerHTML=list.map(p=>`<div class="aicard" onclick="quickAdd(${p.id})"><img src="${p.img}" alt="">${p.t.slice(0,32)}…<div class="p">${fmt(p.p)}</div><div style="color:var(--leaf);font-size:9.5px;margin-top:2px">+ Sepete ekle</div></div>`).join('');
+  chatEl().appendChild(w);chatEl().scrollTop=1e6;
+}
+function aiIntro(){
+  const prof=state.profile.map(k=>DIETNAMES[k]).join(' + ')||'henüz profil seçilmedi';
+  bubble(`Merhaba! 👋 Ben Özel Beslenme asistanın. Profilini biliyorum: <b>${prof}</b>. Ürün önerisi, tarif ya da besin hesabı — ne lazımsa sor.`,'bot');
+}
+function aiFlow(k){
+  const q=k===1?'Glutensiz kek tarifi ver 🧁':k===2?'Günlük protein ihtiyacım ne kadar?':k===3?'Bu haftaki seçkim neler? ✨':(document.getElementById('aiinput').value||'Çölyaklıyım, çocuğuma okul atıştırmalığı önerir misin?');
+  document.getElementById('aiinput').value='';
+  bubble(q,'user');
+  const t=typing();
+  setTimeout(()=>{
+    t.remove();
+    if(k===1){
+      bubble(`Süper seçim! 🧁 <b>Glutensiz havuçlu kek</b> için 5 malzeme gerekiyor: glutensiz un, yumurta, havuç, tarçın ve fıstık ezmesi. Malzemelerden 2'si kilerinde zaten var — eksik olanları hazırladım:`,'bot');
+      aiProducts([PRODUCTS.find(p=>p.col==='glutensiz-atistirmaliklar'&&p.t.includes('ZÜBER'))||PRODUCTS[3],PRODUCTS.filter(p=>p.col==='bitkisel-protein')[0]].filter(Boolean));
+      bubble(`İstersen <b>tek dokunuşla hepsini sepete</b> ekleyebilirim. Tarifin tamamını da adım adım anlatırım 👨‍🍳`,'bot');
+    } else if(k===2){
+      bubble(`68 kg ve orta aktivite düzeyine göre günlük ihtiyacın <b>~95 g protein</b> 💪 Şu an günde ortalama 60 g alıyorsun. Aradaki farkı kapatmak için sana uygun (profilinle uyumlu) seçenekler:`,'bot');
+      aiProducts(PRODUCTS.filter(p=>p.col==='bitkisel-protein').slice(0,3));
+      bubble(`Bu paket <b>3 hafta</b> yeter — bitmeden Akıllı Kiler sana haber verir 🧺`,'bot');
+    } else if(k===3){
+      bubble(`İşte bu haftaki seçkin! 🗓️ Sipariş geçmişine ve <b>glutensiz profiline</b> göre derledim: yeni gelen bir ürün, favori markanda indirim ve rutinine uygun bir tamamlayıcı 👇`,'bot');
+      aiProducts([PRODUCTS.find(p=>p.t.includes('Kinoa Cipsi')),PRODUCTS.filter(p=>p.o&&p.bd.includes('GF'))[0],PRODUCTS.find(p=>p.t.includes('ZÜBER'))].filter(Boolean));
+      bubble(`Bu seçki her pazartesi 10:00'da bildirim olarak da gelir 🔔 — beğenmediğin kategoriyi söylersen bir daha önermem.`,'bot');
+    } else {
+      bubble(`Tabii ki! 🎒 Çölyak dostu, okul çantasına uygun, <b>tamamı glutensiz sertifikalı</b> atıştırmalıklar seçtim — hepsi stokta ve yarın kapında:`,'bot');
+      aiProducts(PRODUCTS.filter(p=>p.col==='glutensiz-atistirmaliklar').slice(0,4));
+      bubble(`3'ünü birden alırsan <b>%5 çoklu alım indirimi</b> uygulanır. Sepete ekleyeyim mi? 🧺`,'bot');
+    }
+  },1400);
+}
+
+/* ---------- PUSH BANNER ---------- */
+let pushTarget=null;
+function showPush(t,b,target){
+  document.getElementById('push-t').textContent=t;
+  document.getElementById('push-b').textContent=b;
+  pushTarget=target;
+  const p=document.getElementById('push');p.classList.add('show');
+  clearTimeout(p._h);p._h=setTimeout(()=>p.classList.remove('show'),6000);
+}
+function pushTap(){
+  document.getElementById('push').classList.remove('show');
+  if(pushTarget)go(pushTarget);
+}
+
+/* ---------- STORIES ---------- */
+const STORIES=[
+  {src:'Tarifler · Salı',bg:'linear-gradient(150deg,#c9721a,#8a4a08)',em:'🧁',h:'Glutensiz Havuçlu Kek',p:'5 malzeme, 40 dakika. İçerik ekibinin her tarifi tek tıkla sepete dönüşür.',cta:'🧺 Malzemeleri sepete ekle (2 ürün)',act:()=>{cartCount+=2;syncCart();toast('Tarif malzemeleri sepette 🧁');closeStory()}},
+  {src:'Kampanya · Cuma',bg:'linear-gradient(150deg,#c8237e,#7d1450)',em:'⚡',h:'GLUTENSİZ CUMA',p:'Sadece app\'e özel, her cuma 12:00\'de. Fidan 🌿 üyeleri 1 saat erken girer.',cta:'Kampanyaya git →',act:()=>{closeStory();go('s-category')}},
+  {src:'Yeni Ürün',bg:'linear-gradient(150deg,#1c7a4d,#0a3d24)',em:'🌱',h:'Nustil Kinoa Cipsi',p:'Glutensiz, vegan, fırında. Yeni gelenleri ilk sen dene.',cta:'Ürünü incele →',act:()=>{closeStory();const p=PRODUCTS.find(x=>x.t.includes('Kinoa Cipsi'));if(p)openProduct(p.id)}}
+];
+let svIdx=0,svTimer=null;
+function openStory(i){
+  svIdx=i;renderStory();
+  document.getElementById('storyview').classList.add('open');
+}
+function renderStory(){
+  const s=STORIES[svIdx];
+  const sv=document.getElementById('storyview');
+  sv.style.background=s.bg;
+  document.getElementById('sv-src').textContent='Özel Beslenme · '+s.src;
+  document.getElementById('sv-body').innerHTML=`<div class="bigem">${s.em}</div><h2>${s.h}</h2><p>${s.p}</p>`;
+  document.getElementById('sv-cta').textContent=s.cta;
+  document.getElementById('sv-bars').innerHTML=STORIES.map((_,i)=>`<i class="${i<svIdx?'done':i===svIdx?'cur':''}"><b></b></i>`).join('');
+  clearTimeout(svTimer);svTimer=setTimeout(nextStorySlide,5000);
+}
+function nextStorySlide(){ svIdx<STORIES.length-1 ? (svIdx++,renderStory()) : closeStory(); }
+function prevStorySlide(){ if(svIdx>0){svIdx--;renderStory();} }
+function storyCTA(){clearTimeout(svTimer);STORIES[svIdx].act();}
+function closeStory(){clearTimeout(svTimer);document.getElementById('storyview').classList.remove('open');}
+
+/* ---------- AYLIK RUTİN ---------- */
+let routine=null;
+function seedRoutine(){
+  routine=[
+    PRODUCTS.find(p=>p.t.includes('Pan Multigrano')),
+    PRODUCTS.find(p=>p.t.includes('ZÜBER')),
+    PRODUCTS.find(p=>p.t.includes('İHE Glutensiz Ekmek 50g x 3'))
+  ].filter(Boolean);
+}
+function renderRoutine(){
+  const el=document.getElementById('rutinbox');if(!el)return;
+  if(!routine){el.innerHTML='';return}
+  const tot=routine.reduce((s,p)=>s+p.p,0);
+  el.innerHTML=`<div class="rutin">
+    <div class="rh">🔁 Aylık Rutinim <span class="tag">HER AYIN 1'İ HATIRLATILIR</span></div>
+    <div class="rimgs">${routine.map(p=>`<img src="${p.img}" alt="">`).join('')}<span class="more">${routine.length} ürün · ${fmt(tot)}</span></div>
+    <button class="rbtn" onclick="routine.forEach(p=>{cartItems.push({...p,qty:1});cartCount++});syncCart();toast('Rutinin sepete eklendi 🔁')">Tek tıkla sepete ekle</button>
+  </div>`;
+}
+function saveRoutine(){
+  routine=cartItems.map(c=>({...c}));
+  renderRoutine();
+  toast('Aylık rutinin kaydedildi 🔁 — her ay hatırlatacağız');
+}
+
+/* ---------- INIT ---------- */
+seedRoutine();
+renderHome();
+</script>
+</body>
+</html>
