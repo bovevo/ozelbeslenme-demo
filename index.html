@@ -29,7 +29,6 @@ body{
 }
 .screen-wrap{width:100%;height:100%;border-radius:45px;overflow:hidden;background:var(--bg);position:relative}
 .notch{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:118px;height:34px;background:#0b0b0c;border-radius:20px;z-index:60}
-.statusbar{position:absolute;top:0;left:0;right:0;height:54px;display:flex;justify-content:space-between;align-items:center;padding:20px 30px 0;z-index:55;font-size:14px;font-weight:700;pointer-events:none}
 @media(max-width:500px){
   body{padding:0}
   .phone{width:100vw;height:100dvh;border-radius:0;padding:0;box-shadow:none}
@@ -52,7 +51,7 @@ body{
 .fab{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--leaf));color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;margin-top:-30px;box-shadow:0 8px 20px rgba(0,65,37,.35);border:4px solid var(--bg);cursor:pointer}
 .badge-cart{position:absolute;margin-left:26px;margin-top:-4px;background:var(--pink);color:#fff;font-size:9.5px;font-weight:800;min-width:16px;height:16px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px}
 /* ==== SHARED ==== */
-.hdr{padding:64px 20px 12px;display:flex;align-items:center;gap:12px}
+.hdr{padding:40px 20px 12px;display:flex;align-items:center;gap:12px}
 .hdr img.logo{height:30px}
 .hdr .spacer{flex:1}
 .iconbtn{width:38px;height:38px;border-radius:12px;background:#fff;border:1px solid #e7efe7;display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer}
@@ -93,7 +92,7 @@ h2.sec .all{margin-left:auto;font-size:12px;color:var(--leaf);font-weight:700}
 .bd.GF{background:#e8930c}.bd.VG{background:var(--leaf)}.bd.LP{background:#7c5cd6}.bd.OR{background:#4c8c2b}
 .pcard .pb{font-size:9.5px;color:#93a398;font-weight:700;text-transform:uppercase;margin-top:7px;letter-spacing:.3px}
 .pcard .pt{font-size:12px;font-weight:700;line-height:1.35;height:33px;overflow:hidden;margin-top:2px}
-.pcard .pr{display:flex;align-items:baseline;gap:6px;margin-top:7px;padding-right:30px}
+.pcard .pr{display:flex;flex-direction:column;align-items:flex-start;gap:1px;margin-top:6px;padding-right:38px;min-height:37px;justify-content:flex-start}
 .pcard .pr .now{font-size:13.5px;font-weight:800;color:var(--green);white-space:nowrap}
 .pcard .pr .old{font-size:10.5px;color:#a9b5ab;text-decoration:line-through;white-space:nowrap}
 .pcard .add{position:absolute;bottom:10px;right:10px;width:28px;height:28px;border-radius:10px;background:var(--green);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer}
@@ -104,7 +103,7 @@ h2.sec .all{margin-left:auto;font-size:12px;color:var(--leaf);font-weight:700}
 .flash .ft span{font-size:11.5px;opacity:.9}
 .flash .timer{margin-left:auto;background:rgba(255,255,255,.18);padding:7px 10px;border-radius:12px;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
 /* ==== ONBOARDING ==== */
-.ob{padding:80px 26px 26px;display:flex;flex-direction:column;position:absolute;inset:0;overflow-y:auto}
+.ob{padding:56px 26px 26px;display:flex;flex-direction:column;position:absolute;inset:0;overflow-y:auto}
 .ob img.logo{height:44px;align-self:flex-start}
 .ob h1{font-size:25px;font-weight:800;line-height:1.25;margin-top:26px}
 .ob h1 em{font-style:normal;color:var(--leaf)}
@@ -152,7 +151,7 @@ h2.sec .all{margin-left:auto;font-size:12px;color:var(--leaf);font-weight:700}
 .buybar .btn-p{flex:1;margin:0;padding:15px}
 /* ==== SCAN ==== */
 .scan{background:#0c1210;color:#fff;flex:1;display:flex;flex-direction:column;position:relative}
-.scan .hdr2{padding:66px 20px 10px;display:flex;align-items:center;gap:10px}
+.scan .hdr2{padding:44px 20px 10px;display:flex;align-items:center;gap:10px}
 .scan .hdr2 b{font-size:16px}
 .scan .hdr2 .back{color:#fff}
 .viewport{margin:16px 30px;flex:1;border-radius:24px;position:relative;background:
@@ -224,7 +223,7 @@ h2.sec .all{margin-left:auto;font-size:12px;color:var(--leaf);font-weight:700}
 .mi .chev{margin-left:auto;color:#b9c9be}
 .mi small{display:block;font-size:10.5px;color:#93a398;font-weight:600;margin-top:1px}
 /* login */
-.login{padding:90px 26px 30px;display:flex;flex-direction:column;position:absolute;inset:0;overflow-y:auto}
+.login{padding:64px 26px 30px;display:flex;flex-direction:column;position:absolute;inset:0;overflow-y:auto}
 .login h1{font-size:23px;font-weight:800;line-height:1.3;margin-top:22px}
 .login .lead{font-size:13px;color:var(--ink2);margin-top:8px;line-height:1.55}
 .login input{border:1.5px solid #e2ece2;border-radius:14px;padding:15px 16px;font-size:14px;font-family:inherit;outline:none;background:#fff;margin-top:18px}
@@ -261,19 +260,20 @@ h2.sec .all{margin-left:auto;font-size:12px;color:var(--leaf);font-weight:700}
 /* story viewer */
 .storyview{position:absolute;inset:0;z-index:90;display:none;flex-direction:column;color:#fff}
 .storyview.open{display:flex}
-.sv-bars{display:flex;gap:5px;padding:60px 16px 10px}
+.sv-bars{display:flex;gap:5px;padding:40px 16px 10px}
 .sv-bars i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.3);overflow:hidden;position:relative}
 .sv-bars i b{position:absolute;inset:0;width:0;background:#fff}
 .sv-bars i.done b{width:100%}
 .sv-bars i.cur b{animation:svfill 5s linear forwards}
 @keyframes svfill{from{width:0}to{width:100%}}
-.sv-head{display:flex;align-items:center;gap:10px;padding:8px 16px;font-size:12.5px;font-weight:700}
+.sv-head{display:flex;align-items:center;gap:10px;padding:8px 16px;font-size:12.5px;font-weight:700;position:relative;z-index:10}
 .sv-head .x{margin-left:auto;font-size:22px;cursor:pointer;background:none;border:none;color:#fff;padding:2px 6px}
 .sv-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 34px;gap:12px}
 .sv-body .bigem{font-size:74px}
 .sv-body h2{font-size:24px;font-weight:800;line-height:1.3}
 .sv-body p{font-size:14px;opacity:.92;line-height:1.55}
-.sv-cta{margin:0 22px 46px}
+.sv-cta{margin:0 22px 46px;position:relative;z-index:10}
+.sv-tap{position:absolute;top:70px;bottom:130px;width:48%;z-index:5;cursor:pointer}
 .sv-cta button{width:100%;background:#fff;color:var(--ink);border:none;border-radius:16px;padding:16px;font-size:14.5px;font-weight:800;font-family:inherit;cursor:pointer}
 /* kulüp */
 .lvlhero{margin:10px 20px;background:linear-gradient(130deg,var(--green),#0c6b41);border-radius:22px;padding:20px;color:#fff}
@@ -320,8 +320,7 @@ h2.sec .all{margin-left:auto;font-size:12px;color:var(--leaf);font-weight:700}
 <div class="phone">
   <div class="screen-wrap" id="app">
     <div class="notch"></div>
-    <div class="statusbar"><span>9:41</span><span>􀙇 􀛨 %92</span></div>
-
+    
     <!-- ONBOARDING -->
     <section class="scr active" id="s-onboard">
       <div class="ob">
@@ -408,7 +407,7 @@ h2.sec .all{margin-left:auto;font-size:12px;color:var(--leaf);font-weight:700}
     <section class="scr" id="s-product">
       <div class="hdr" style="position:absolute;top:0;left:0;right:0;z-index:30"><button class="back" onclick="go(lastList)">‹</button><div class="spacer"></div><div class="iconbtn" onclick="toast('Mst:Wishlist entegrasyonu ❤️')">🤍</div></div>
       <div class="scroll" style="padding-bottom:150px">
-        <div class="pd-img" style="padding-top:100px"><img id="pd-img" src="" alt=""></div>
+        <div class="pd-img" style="padding-top:84px"><img id="pd-img" src="" alt=""></div>
         <div class="pd-body">
           <div id="pd-badges" style="display:flex;gap:6px"></div>
           <div class="pd-brand" id="pd-brand"></div>
@@ -555,8 +554,8 @@ h2.sec .all{margin-left:auto;font-size:12px;color:var(--leaf);font-weight:700}
       <div class="hdr"><button class="back" onclick="go('s-home')">‹</button><b style="font-size:17px">Hesabım</b></div>
       <div class="scroll">
         <div class="acct-head" onclick="go('s-kulup')">
-          <div class="avatar">İY</div>
-          <div><b style="font-size:15px">İsmail Yılmaz</b><div style="font-size:11.5px;color:#93a398;font-weight:600;margin-top:2px">ismail@ornek.com</div>
+          <div class="avatar">İE</div>
+          <div><b style="font-size:15px">İsmail Cem Erzincalı</b><div style="font-size:11.5px;color:#93a398;font-weight:600;margin-top:2px">ismail@ornek.com</div>
           <div style="font-size:10.5px;color:var(--green);font-weight:800;margin-top:4px">🌿 Fidan Kulübü · 1.240 puan ›</div></div>
         </div>
         <div class="menu">
@@ -606,12 +605,12 @@ h2.sec .all{margin-left:auto;font-size:12px;color:var(--leaf);font-weight:700}
         <div class="addr def">
           <span class="tagd">VARSAYILAN</span>
           <b>🏠 Ev</b>
-          <p>İsmail Yılmaz · 0532 *** ** 41<br>Acıbadem Mah. Gülden Sok. No:12 D:5<br>Kadıköy / İstanbul</p>
+          <p>İsmail Cem Erzincalı · 0532 *** ** 41<br>Acıbadem Mah. Gülden Sok. No:12 D:5<br>Kadıköy / İstanbul</p>
           <div class="aacts" onclick="toast('Adres düzenleme formu açılır')">Düzenle</div>
         </div>
         <div class="addr">
           <b>🏢 İş</b>
-          <p>İsmail Yılmaz · 0532 *** ** 41<br>Esentepe Mah. Büyükdere Cad. No:201 K:14<br>Şişli / İstanbul</p>
+          <p>İsmail Cem Erzincalı · 0532 *** ** 41<br>Esentepe Mah. Büyükdere Cad. No:201 K:14<br>Şişli / İstanbul</p>
           <div class="aacts" onclick="toast('Adres düzenleme formu açılır')">Düzenle · Varsayılan yap</div>
         </div>
         <div style="margin:14px 20px"><button class="btn-p" style="box-shadow:none" onclick="toast('Yeni adres formu: il/ilçe seçimli, haritadan konum destekli')">+ Yeni Adres Ekle</button></div>
@@ -628,7 +627,7 @@ h2.sec .all{margin-left:auto;font-size:12px;color:var(--leaf);font-weight:700}
 
     <!-- KULÜP -->
     <section class="scr" id="s-kulup">
-      <div class="hdr"><button class="back" onclick="go('s-home')">‹</button><b style="font-size:17px">🌿 Özel Kulüp</b><div class="spacer"></div><span style="font-size:9.5px;background:var(--mint-soft);color:var(--green);font-weight:800;padding:4px 8px;border-radius:8px">LOYALTYLION</span></div>
+      <div class="hdr"><button class="back" onclick="go('s-home')">‹</button><b style="font-size:17px">🌿 Özel Kulüp</b></div>
       <div class="scroll">
         <div class="lvlhero">
           <div class="em">🌿</div>
@@ -917,7 +916,7 @@ function renderStory(){
   clearTimeout(svTimer);svTimer=setTimeout(nextStorySlide,5000);
 }
 function nextStorySlide(){ svIdx<STORIES.length-1 ? (svIdx++,renderStory()) : closeStory(); }
-function prevStorySlide(){ if(svIdx>0){svIdx--;renderStory();} }
+function prevStorySlide(){ if(svIdx>0){svIdx--;} renderStory(); }
 function storyCTA(){clearTimeout(svTimer);STORIES[svIdx].act();}
 function closeStory(){clearTimeout(svTimer);document.getElementById('storyview').classList.remove('open');}
 
